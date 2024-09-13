@@ -10,6 +10,7 @@ public class LedgeDetection : MonoBehaviour
 
     private bool canDetectLedge;
 
+    private BoxCollider2D boxCd => GetComponent<BoxCollider2D>();
 
     private void Update()
     {
@@ -28,6 +29,11 @@ public class LedgeDetection : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
+
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(boxCd.bounds.center, boxCd.size, 0);
+
+        
+
         if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
             canDetectLedge = true;

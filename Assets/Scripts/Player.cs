@@ -46,11 +46,23 @@ public class Player : MonoBehaviour
     private float slideTimeCounter;
     private bool isSliding;
 
+    [Header("Speed Info")]
+    private float defaultSpeed;
+    private float defaultMilestoneIncrease;
+    [SerializeField] private float maxSpeed;
+    [SerializeField] private float speedMultiplier;
+    [SerializeField] private float milestoneIncreaser;
+    private float speedMilestone;
+
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+
+        speedMilestone = milestoneIncreaser;
+        defaultSpeed = moveSpeed;
+        defaultMilestoneIncrease = milestoneIncreaser;
     }
 
     // Update is called once per frame
@@ -78,6 +90,7 @@ public class Player : MonoBehaviour
 
         CheckForLedge();
         InputChecks();
+        SpeedController();
         CollisionChecks();
         AnimationController();
 
@@ -108,36 +121,7 @@ public class Player : MonoBehaviour
         anim.SetBool("canClimb", canClimb);
     }
 
-    private void LedgeClimbOver()
-    {
-        canClimb = false;
-        transform.position = climbOverPosition;
-        Invoke("AllowLedgeGrab",.1f);
-
-    }
-
-    private void AllowLedgeGrab()
-    {
-        canGrabLedge = true;
-    }
-
-    private void CheckForLedge()
-    {
-        if (isLedgeDetected && canGrabLedge)
-        {
-            canGrabLedge = false;
-          
-            climbBegunPosition = transform.position + offset1;
-            climbOverPosition = transform.position + offset2;
-
-            canClimb = true;
-        }
-
-        if (canClimb)
-        {
-            transform.position = climbBegunPosition;
-        }
-    }
+    
 
     private void SlideController()
     {
@@ -155,12 +139,12 @@ public class Player : MonoBehaviour
 
         if (!isSliding && !isWallDetected)
         {
-            print("keep move");
+            
             rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
         }
         else if (isWallDetected)
         {
-            print("stopped");
+            SpeedReset();
             rb.velocity = new Vector2(0, rb.velocity.y);
         }
         else
@@ -171,6 +155,8 @@ public class Player : MonoBehaviour
 
 
     }
+
+    #region Jump
 
     private void Jump(float forceMultiplier)
     {
@@ -193,6 +179,71 @@ public class Player : MonoBehaviour
         }
 
     }
+
+    #endregion
+
+    #region LedgeClimb
+
+    private void LedgeClimbOver()
+    {
+        canClimb = false;
+        transform.position = climbOverPosition;
+        Invoke("AllowLedgeGrab", .1f);
+
+    }
+
+    private void AllowLedgeGrab()
+    {
+        canGrabLedge = true;
+    }
+
+    private void CheckForLedge()
+    {
+        if (isLedgeDetected && canGrabLedge)
+        {
+            canGrabLedge = false;
+
+            climbBegunPosition = transform.position + offset1;
+            climbOverPosition = transform.position + offset2;
+
+            canClimb = true;
+        }
+
+        if (canClimb)
+        {
+            transform.position = climbBegunPosition;
+        }
+    }
+
+    #endregion
+
+    #region SpeedControll
+
+
+    private void SpeedReset()
+    {
+        moveSpeed = defaultSpeed;
+        milestoneIncreaser = defaultMilestoneIncrease;
+    }
+
+    private void SpeedController()
+    {
+
+        if (moveSpeed == maxSpeed)
+            return;
+
+        if(transform.position.x > speedMilestone)
+        {
+            speedMilestone = speedMilestone + milestoneIncreaser;
+
+            moveSpeed *= speedMultiplier;
+            milestoneIncreaser = milestoneIncreaser * speedMultiplier;
+
+            if (moveSpeed > maxSpeed)
+                moveSpeed = maxSpeed;
+        }
+    }
+    #endregion
 
     private void CollisionChecks()
     {
