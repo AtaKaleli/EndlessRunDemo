@@ -119,9 +119,15 @@ public class Player : MonoBehaviour
         anim.SetBool("canDoubleJump", canDoubleJump);
         anim.SetBool("isSliding", isSliding);
         anim.SetBool("canClimb", canClimb);
+
+        if (rb.velocity.y < -20)
+            anim.SetBool("canRoll", true);
     }
 
-    
+    private void RollAnimFinished()
+    {
+        anim.SetBool("canRoll", false);
+    }
 
     private void SlideController()
     {
@@ -187,6 +193,7 @@ public class Player : MonoBehaviour
     private void LedgeClimbOver()
     {
         canClimb = false;
+        //rb.gravityScale = 4;
         transform.position = climbOverPosition;
         Invoke("AllowLedgeGrab", .1f);
 
@@ -202,6 +209,7 @@ public class Player : MonoBehaviour
         if (isLedgeDetected && canGrabLedge)
         {
             canGrabLedge = false;
+            //rb.gravityScale = 0;
 
             climbBegunPosition = transform.position + offset1;
             climbOverPosition = transform.position + offset2;
