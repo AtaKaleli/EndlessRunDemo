@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
 
 
     private int coin;
+    public Color platformColor;
 
     private void Awake()
     {
@@ -26,6 +27,7 @@ public class GameManager : MonoBehaviour
         coin++;
     }
 
-
+    
+    
     
 }

@@ -346,6 +346,16 @@ public class Player : MonoBehaviour
         
     }
 
+    public void Damage()
+    {
+        if (moveSpeed >= maxSpeed)
+        {
+            Knockback();
+            moveSpeed = defaultSpeed;
+        }
+        else
+            StartCoroutine(Die());
+    }
 
     private void CollisionChecks()
     {
