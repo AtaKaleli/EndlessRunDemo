@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -5,13 +6,14 @@ public class Player : MonoBehaviour
 
     private Rigidbody2D rb;
     private Animator anim;
+    private SpriteRenderer sr;
+    
+    private bool playerUnlocked;
+    private bool isDead;
 
-
-    [Header("Player Inputs")]
+    [Header("Player Forces")]
     [SerializeField] private float jumpForce;
     [SerializeField] private float moveSpeed;
-    [SerializeField] private float slidingMoveSpeed;
-    private bool playerUnlocked;
     private bool canDoubleJump = true;
 
 
@@ -42,6 +44,7 @@ public class Player : MonoBehaviour
     private bool canClimb;
 
     [Header("Slide Ability")]
+    [SerializeField] private float slidingMoveSpeed;
     [SerializeField] private float slideTimer;
     private float slideTimeCounter;
     private bool isSliding;
@@ -54,11 +57,18 @@ public class Player : MonoBehaviour
     [SerializeField] private float milestoneIncreaser;
     private float speedMilestone;
 
+    [Header("KnockBack Info")]
+    [SerializeField] private Vector2 knockDirection;
+    private bool isKnocked;
+    private bool canBeKnocked = true;
+
+
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>();
 
         speedMilestone = milestoneIncreaser;
         defaultSpeed = moveSpeed;
@@ -69,6 +79,9 @@ public class Player : MonoBehaviour
     void Update()
     {
 
+        CollisionChecks();
+        AnimationController();
+
         slideTimeCounter -= Time.deltaTime;
 
         if (slideTimeCounter < 0 && !isUpperGroundDetected)
@@ -76,6 +89,12 @@ public class Player : MonoBehaviour
             isSliding = false;
         }
 
+        if (isDead)
+            return;
+       
+        
+        if (isKnocked)
+            return;
 
 
         if (playerUnlocked)
@@ -87,12 +106,10 @@ public class Player : MonoBehaviour
 
 
 
-
         CheckForLedge();
-        InputChecks();
         SpeedController();
-        CollisionChecks();
-        AnimationController();
+        InputChecks();
+
 
     }
 
@@ -107,6 +124,18 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
             JumpController();
 
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+          
+            Knockback();
+        }
+
+        if (Input.GetKeyDown(KeyCode.W) && !isDead)
+        {
+
+            StartCoroutine(Die());
+        }
+        
 
 
     }
@@ -119,6 +148,8 @@ public class Player : MonoBehaviour
         anim.SetBool("canDoubleJump", canDoubleJump);
         anim.SetBool("isSliding", isSliding);
         anim.SetBool("canClimb", canClimb);
+        anim.SetBool("isKnocked", isKnocked);
+        anim.SetBool("isDead", isDead);
 
         if (rb.velocity.y < -20)
             anim.SetBool("canRoll", true);
@@ -252,6 +283,69 @@ public class Player : MonoBehaviour
         }
     }
     #endregion
+
+    #region Knockback & Invincibility
+    private IEnumerator Invincibility()
+    {
+        StartCoroutine(BlinkPlayer());
+        canBeKnocked = false;
+        yield return new WaitForSeconds(1f);
+        canBeKnocked = true;
+
+    }
+
+    private IEnumerator BlinkPlayer()
+    {
+        Color playerColor = new Color(1, 1, 1, 1f);
+        Color darkerColor = new Color(1,1,1,0.5f);
+       
+        
+        yield return new WaitForSeconds(.1f);
+        sr.color = playerColor;
+        yield return new WaitForSeconds(.1f);
+        sr.color = darkerColor;
+        yield return new WaitForSeconds(.15f);
+        sr.color = playerColor;
+        yield return new WaitForSeconds(.15f);
+        sr.color = darkerColor;
+        yield return new WaitForSeconds(.25f);
+        sr.color = playerColor;
+        yield return new WaitForSeconds(.25f);
+        sr.color = darkerColor;
+        
+        yield return new WaitForSeconds(.1f);
+
+        sr.color = playerColor;
+    }
+
+
+    private void Knockback()
+    {
+        if (!canBeKnocked)
+            return;
+
+        StartCoroutine(Invincibility());
+        isKnocked = true;
+        rb.velocity = knockDirection;
+    }
+
+    private void CancelKnockback() => isKnocked = false;
+
+    #endregion
+
+
+    private IEnumerator Die()
+    {
+       
+        isDead = true;
+        canBeKnocked = false;
+        rb.velocity = knockDirection;
+
+        yield return new WaitForSeconds(.75f);
+        rb.velocity = new Vector2(0, 0);
+        
+    }
+
 
     private void CollisionChecks()
     {
