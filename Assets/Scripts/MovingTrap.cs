@@ -10,8 +10,9 @@ public class MovingTrap : Trap
     private int i; //stands for movePoint index
 
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         transform.position = movePoints[0].position;
     }
 
