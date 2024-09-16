@@ -4,15 +4,37 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+
+    [SerializeField] private GameObject[] UIElements;
+
+    private void Start()
     {
-        
+        for (int i = 1; i < UIElements.Length; i++)
+        {
+            UIElements[i].SetActive(false);
+        }
+
+        UIElements[0].SetActive(true);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SwitchToUI(GameObject targetUI)
     {
-        
+        for (int i = 0; i < UIElements.Length; i++)
+        {
+            UIElements[i].SetActive(false);
+        }
+
+        targetUI.SetActive(true);
     }
+
+    public void StartGame()
+    {
+        GameManager.instance.UnlockPlayer();
+    }
+
+    
+
+
+
+
 }

@@ -22,6 +22,7 @@ public class Trap : MonoBehaviour
         {
             Player player = collision.GetComponent<Player>();
             player.Damage();
+            
         }
     }
 

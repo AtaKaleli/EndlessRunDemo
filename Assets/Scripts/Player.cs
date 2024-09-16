@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     private Animator anim;
     private SpriteRenderer sr;
     
-    private bool playerUnlocked;
+    [HideInInspector] public bool playerUnlocked;
     private bool isDead;
 
     [Header("Player Forces")]
@@ -115,8 +115,7 @@ public class Player : MonoBehaviour
 
     private void InputChecks()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse1))
-            playerUnlocked = true;
+        
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
             SlideController();
@@ -259,8 +258,9 @@ public class Player : MonoBehaviour
     #region SpeedControll
 
 
-    private void SpeedReset()
+    public void SpeedReset()
     {
+        GameManager.instance.haveSecondChance = false;
         moveSpeed = defaultSpeed;
         milestoneIncreaser = defaultMilestoneIncrease;
     }
@@ -270,8 +270,10 @@ public class Player : MonoBehaviour
 
         if (moveSpeed == maxSpeed)
             return;
+        else
+            GameManager.instance.haveSecondChance = false;
 
-        if(transform.position.x > speedMilestone)
+        if (transform.position.x > speedMilestone)
         {
             speedMilestone = speedMilestone + milestoneIncreaser;
 
@@ -279,7 +281,13 @@ public class Player : MonoBehaviour
             milestoneIncreaser = milestoneIncreaser * speedMultiplier;
 
             if (moveSpeed > maxSpeed)
+            {
                 moveSpeed = maxSpeed;
+                GameManager.instance.haveSecondChance = true;
+            }
+            
+
+            
         }
     }
     #endregion
@@ -351,7 +359,7 @@ public class Player : MonoBehaviour
 
     public void Damage()
     {
-        if (moveSpeed >= maxSpeed)
+        if (GameManager.instance.haveSecondChance)
         {
             Knockback();
             moveSpeed = defaultSpeed;

@@ -8,9 +8,13 @@ public class GameManager : MonoBehaviour
 
     public static GameManager instance;
 
-
-    private int coin;
+    public Player player;
     public Color platformColor;
+
+
+    public int coin;
+    public float distance;
+    public bool haveSecondChance;
 
     private void Awake()
     {
@@ -22,11 +26,19 @@ public class GameManager : MonoBehaviour
 
     }
 
-
-    public void CollectCoin()
+    private void Update()
     {
-        coin++;
+        print(haveSecondChance);
+        if (player.transform.position.x > distance)
+            distance = player.transform.position.x;
     }
+
+    public void UnlockPlayer()
+    {
+        player.playerUnlocked = true;
+    }
+
+    
 
     public void RestartLevel()
     {
