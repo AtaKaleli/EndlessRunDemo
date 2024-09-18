@@ -304,10 +304,10 @@ public class Player : MonoBehaviour
 
     private IEnumerator BlinkPlayer()
     {
-        Color playerColor = new Color(1, 1, 1, 1f);
-        Color darkerColor = new Color(1,1,1,0.5f);
-       
-        
+        Color playerColor = new Color(sr.color.r,sr.color.b,sr.color.g, 1f);
+        Color darkerColor = new Color(sr.color.r, sr.color.b, sr.color.g, .5f);
+
+
         yield return new WaitForSeconds(.1f);
         sr.color = playerColor;
         yield return new WaitForSeconds(.1f);
@@ -347,13 +347,15 @@ public class Player : MonoBehaviour
        
         isDead = true;
         canBeKnocked = false;
+        Time.timeScale = 0.6f;
         rb.velocity = knockDirection;
 
-        yield return new WaitForSeconds(.75f);
+        yield return new WaitForSeconds(1f);
         rb.velocity = new Vector2(0, 0);
 
         yield return new WaitForSeconds(1f);
-        GameManager.instance.RestartLevel();
+
+        GameManager.instance.OpenEndGameUI();
         
     }
 

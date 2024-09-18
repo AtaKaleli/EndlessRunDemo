@@ -24,12 +24,13 @@ public class UI_Ingame : MonoBehaviour
 
     private void Start()
     {
+        GameManager.instance.coins = 0;
         InvokeRepeating("UpdateInfo", 0, .2f);
     }
 
     private void UpdateInfo()
     {
-        coinText.text = GameManager.instance.coin.ToString();
+        coinText.text = GameManager.instance.coins.ToString();
         distanceText.text = GameManager.instance.distance.ToString("0") + " m";
         heartFull.enabled = GameManager.instance.haveSecondChance;
 
