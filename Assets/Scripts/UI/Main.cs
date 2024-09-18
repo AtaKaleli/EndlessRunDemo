@@ -16,6 +16,7 @@ public class Main : MonoBehaviour
 
     private bool gamePaused;
 
+    [SerializeField] private UI_Settings[] volumeController;
 
     private void Awake()
     {
@@ -39,6 +40,11 @@ public class Main : MonoBehaviour
         UIElements[0].SetActive(true);
         UpdateInfo();
 
+        for (int i = 0; i < volumeController.Length; i++)
+        {
+            volumeController[i].GetComponent<UI_Settings>().SetupVolumeSlider();
+        }
+
     }
 
     public void SwitchToUI(GameObject targetUI)
@@ -49,6 +55,7 @@ public class Main : MonoBehaviour
         }
 
         targetUI.SetActive(true);
+        AudioManager.instance.PlaySFX(5);
         UpdateInfo();
     }
 
